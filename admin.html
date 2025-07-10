@@ -1,0 +1,752 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Cookie's Tournaments</title>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <h2>🍪 Cookie's Tournaments - Admin Panel</h2>
+        </div>
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">Back to Main Site</a>
+            <a href="#" onclick="logout()" class="nav-link" id="logoutLink">Logout</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="admin-header">
+            <h1>🛠️ Admin Control Panel</h1>
+            <div class="admin-info">
+                <p><strong>Welcome, Administrator!</strong></p>
+                <p id="adminUsername">Loading...</p>
+                <small>Manage tournaments, users, and generate brackets from this comprehensive control panel.</small>
+            </div>
+        </div>
+
+        <!-- Admin Dashboard Stats -->
+        <div class="admin-stats">
+            <div class="stat-card">
+                <h3>Total Tournaments</h3>
+                <div class="stat-number" id="totalTournaments">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Active Users</h3>
+                <div class="stat-number" id="totalUsers">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Ongoing Tournaments</h3>
+                <div class="stat-number" id="ongoingTournaments">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Completed Tournaments</h3>
+                <div class="stat-number" id="completedTournaments">0</div>
+            </div>
+        </div>
+
+        <!-- Admin Sections -->
+        <div class="admin-sections">
+            <!-- Tournament Management -->
+            <div class="admin-section">
+                <h3>🏆 Tournament Management</h3>
+                
+                <!-- Add New Tournament -->
+                <div class="admin-subsection">
+                    <h4>Add New Tournament</h4>
+                    <form id="addTournamentForm" class="admin-form">
+                        <div class="form-row">
+                            <input type="text" id="tournamentName" placeholder="Tournament Name" required>
+                            <input type="date" id="tournamentDate" required>
+                        </div>
+                        <div class="form-row">
+                            <select id="maxPlayers" required>
+                                <option value="">Select Max Players</option>
+                                <option value="2">2 Players</option>
+                                <option value="4">4 Players</option>
+                                <option value="8">8 Players</option>
+                                <option value="16">16 Players</option>
+                            </select>
+                            <select id="tournamentStatus">
+                                <option value="upcoming">Upcoming</option>
+                                <option value="ongoing">Ongoing</option>
+                                <option value="finished">Finished</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary">Add Tournament</button>
+                    </form>
+                </div>
+
+                <!-- Manage Existing Tournaments -->
+                <div class="admin-subsection">
+                    <h4>Manage Existing Tournaments</h4>
+                    <div class="tournament-filter">
+                        <button class="filter-btn active" onclick="filterAdminTournaments('all')">All</button>
+                        <button class="filter-btn" onclick="filterAdminTournaments('upcoming')">Upcoming</button>
+                        <button class="filter-btn" onclick="filterAdminTournaments('ongoing')">Ongoing</button>
+                        <button class="filter-btn" onclick="filterAdminTournaments('finished')">Finished</button>
+                    </div>
+                    <div id="adminTournamentsList" class="admin-list"></div>
+                </div>
+            </div>
+
+            <!-- User Management -->
+            <div class="admin-section">
+                <h3>👥 User Management</h3>
+                
+                <!-- User Stats -->
+                <div class="admin-subsection">
+                    <h4>User Statistics</h4>
+                    <div class="user-stats">
+                        <div class="stat-item">
+                            <span>Total Registrations:</span>
+                            <span id="totalRegistrations">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>Active Players:</span>
+                            <span id="activePlayers">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>Top Player:</span>
+                            <span id="topPlayer">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Manage Users -->
+                <div class="admin-subsection">
+                    <h4>Registered Users</h4>
+                    <div class="user-controls">
+                        <input type="text" id="userSearch" placeholder="Search users..." onkeyup="filterUsers()">
+                        <button onclick="exportUserData()" class="btn-secondary">Export Data</button>
+                    </div>
+                    <div id="adminUsersList" class="admin-list"></div>
+                </div>
+            </div>
+
+            <!-- Bracket Management -->
+            <div class="admin-section">
+                <h3>🎯 Bracket Management</h3>
+                
+                <div class="admin-subsection">
+                    <h4>Generate & Manage Brackets</h4>
+                    <div id="bracketManagement" class="bracket-management">
+                        <p>Select a tournament to generate or manage its bracket:</p>
+                        <select id="bracketTournamentSelect">
+                            <option value="">Select Tournament</option>
+                        </select>
+                        <div class="bracket-actions">
+                            <button onclick="generateBracket()" class="btn-generate">Generate Bracket</button>
+                            <button onclick="viewBracket()" class="btn-secondary">View Bracket</button>
+                            <button onclick="resetBracket()" class="btn-danger">Reset Bracket</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Settings -->
+            <div class="admin-section">
+                <h3>⚙️ System Settings</h3>
+                
+                <div class="admin-subsection">
+                    <h4>Data Management</h4>
+                    <div class="data-actions">
+                        <button onclick="exportAllData()" class="btn-primary">Export All Data</button>
+                        <button onclick="importData()" class="btn-secondary">Import Data</button>
+                        <button onclick="resetAllData()" class="btn-danger">Reset All Data</button>
+                    </div>
+                    <input type="file" id="importFile" accept=".json" style="display: none;">
+                </div>
+
+                <div class="admin-subsection">
+                    <h4>System Status</h4>
+                    <div class="system-status">
+                        <div class="status-item">
+                            <span>Last Backup:</span>
+                            <span id="lastBackup">Never</span>
+                        </div>
+                        <div class="status-item">
+                            <span>Data Storage:</span>
+                            <span id="dataStorage">localStorage</span>
+                        </div>
+                        <div class="status-item">
+                            <span>System Health:</span>
+                            <span id="systemHealth" class="status-ok">OK</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tournament Bracket Modal -->
+    <div id="bracketModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeBracketModal()">&times;</span>
+            <h2 id="bracketTitle">Tournament Bracket</h2>
+            <div id="bracketContent"></div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <h3>Confirm Action</h3>
+            <p id="confirmMessage"></p>
+            <div class="modal-actions">
+                <button onclick="confirmAction()" class="btn-danger">Confirm</button>
+                <button onclick="closeConfirmModal()" class="btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script>
+        // Load shared script for DataSync
+        const script = document.createElement('script');
+        script.src = 'script.js';
+        document.head.appendChild(script);
+        
+        const usersScript = document.createElement('script');
+        usersScript.src = 'users.js';
+        document.head.appendChild(usersScript);
+        
+        const tournamentsScript = document.createElement('script');
+        tournamentsScript.src = 'tournaments.js';
+        document.head.appendChild(tournamentsScript);
+
+        // Admin Panel JavaScript
+        class AdminPanel {
+            constructor() {
+                this.currentUser = null;
+                this.users = [];
+                this.tournaments = [];
+                this.currentAction = null;
+                this.dataSync = null;
+                this.init();
+            }
+
+            init() {
+                // Wait for DataSync to be available
+                setTimeout(() => {
+                    this.dataSync = DataSync.getInstance();
+                    this.loadData();
+                    this.setupDataSync();
+                    this.checkAdminAccess();
+                    this.setupEventListeners();
+                    this.loadDashboard();
+                }, 100);
+            }
+
+            setupDataSync() {
+                this.dataSync.subscribe((event, key, value) => {
+                    if (event === 'dataChanged') {
+                        this.handleDataSync(key, value);
+                    }
+                });
+            }
+            
+            handleDataSync(key, value) {
+                const data = value ? JSON.parse(value) : null;
+                
+                switch(key) {
+                    case this.dataSync.storageKeys.users:
+                        this.users = data || [];
+                        this.loadUsers();
+                        this.updateStats();
+                        break;
+                    case this.dataSync.storageKeys.tournaments:
+                        this.tournaments = data || [];
+                        this.loadTournaments();
+                        this.loadBracketTournaments();
+                        this.updateStats();
+                        break;
+                    case this.dataSync.storageKeys.currentUser:
+                        this.currentUser = data;
+                        break;
+                }
+            }
+
+            loadData() {
+                this.users = this.dataSync.load(this.dataSync.storageKeys.users) || [];
+                this.tournaments = this.dataSync.load(this.dataSync.storageKeys.tournaments) || [];
+                this.currentUser = this.dataSync.load(this.dataSync.storageKeys.currentUser);
+            }
+
+            checkAdminAccess() {
+                if (!this.currentUser || !this.currentUser.isAdmin) {
+                    this.showMessage('Access denied! Admin privileges required.', 'error');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 2000);
+                    return;
+                }
+                document.getElementById('adminUsername').textContent = this.currentUser.username;
+            }
+
+            setupEventListeners() {
+                document.getElementById('addTournamentForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.handleAddTournament();
+                });
+
+                document.getElementById('importFile').addEventListener('change', (e) => {
+                    this.handleImportData(e);
+                });
+            }
+
+            loadDashboard() {
+                this.updateStats();
+                this.loadTournaments();
+                this.loadUsers();
+                this.loadBracketTournaments();
+            }
+
+            updateStats() {
+                const totalTournaments = this.tournaments.length;
+                const totalUsers = this.users.filter(u => !u.isAdmin).length;
+                const ongoingTournaments = this.tournaments.filter(t => t.status === 'ongoing').length;
+                const completedTournaments = this.tournaments.filter(t => t.status === 'finished').length;
+
+                document.getElementById('totalTournaments').textContent = totalTournaments;
+                document.getElementById('totalUsers').textContent = totalUsers;
+                document.getElementById('ongoingTournaments').textContent = ongoingTournaments;
+                document.getElementById('completedTournaments').textContent = completedTournaments;
+
+                // User stats
+                document.getElementById('totalRegistrations').textContent = totalUsers;
+                document.getElementById('activePlayers').textContent = this.users.filter(u => !u.isAdmin && u.joinedTournaments.length > 0).length;
+                
+                const topPlayer = this.users.filter(u => !u.isAdmin).sort((a, b) => b.wins - a.wins)[0];
+                document.getElementById('topPlayer').textContent = topPlayer ? topPlayer.username : 'None';
+            }
+
+            loadTournaments() {
+                const list = document.getElementById('adminTournamentsList');
+                list.innerHTML = '';
+
+                this.tournaments.forEach(tournament => {
+                    const item = document.createElement('div');
+                    item.className = 'admin-tournament-item';
+                    item.dataset.status = tournament.status;
+                    
+                    const playerNames = tournament.players.map(playerId => {
+                        const user = this.users.find(u => u.id === playerId);
+                        return user ? user.username : 'Unknown';
+                    });
+
+                    item.innerHTML = `
+                        <div class="tournament-info">
+                            <h4>${tournament.name}</h4>
+                            <p>Date: ${new Date(tournament.date).toLocaleDateString()}</p>
+                            <p>Status: <span class="status-badge status-${tournament.status}">${tournament.status}</span></p>
+                            <p>Players: ${tournament.players.length}/${tournament.maxPlayers}</p>
+                            <p>Participants: ${playerNames.join(', ') || 'None'}</p>
+                        </div>
+                        <div class="admin-actions">
+                            <button onclick="adminPanel.editTournament(${tournament.id})" class="btn-secondary">Edit</button>
+                            ${tournament.players.length >= 2 && !tournament.bracketHTML ? 
+                                `<button onclick="adminPanel.generateTournamentBracket(${tournament.id})" class="btn-generate">Generate Bracket</button>` : 
+                                ''
+                            }
+                            ${tournament.bracketHTML ? 
+                                `<button onclick="adminPanel.viewTournamentBracket(${tournament.id})" class="btn-secondary">View Bracket</button>` : 
+                                ''
+                            }
+                            <button onclick="adminPanel.deleteTournament(${tournament.id})" class="btn-danger">Delete</button>
+                        </div>
+                    `;
+
+                    list.appendChild(item);
+                });
+            }
+
+            loadUsers() {
+                const list = document.getElementById('adminUsersList');
+                list.innerHTML = '';
+
+                this.users.filter(u => !u.isAdmin).forEach(user => {
+                    const item = document.createElement('div');
+                    item.className = 'admin-user-item';
+
+                    const winRate = user.wins + user.losses > 0 ? 
+                        Math.round((user.wins / (user.wins + user.losses)) * 100) : 0;
+
+                    item.innerHTML = `
+                        <div class="user-info">
+                            <h4>${user.username}</h4>
+                            <p>Tournaments: ${user.joinedTournaments.length}</p>
+                            <p>Record: ${user.wins}W - ${user.losses}L (${winRate}%)</p>
+                            <p>Registered: ${new Date().toLocaleDateString()}</p>
+                        </div>
+                        <div class="admin-actions">
+                            <button onclick="adminPanel.editUser(${user.id})" class="btn-secondary">Edit</button>
+                            <button onclick="adminPanel.resetUserStats(${user.id})" class="btn-generate">Reset Stats</button>
+                            <button onclick="adminPanel.deleteUser(${user.id})" class="btn-danger">Delete</button>
+                        </div>
+                    `;
+
+                    list.appendChild(item);
+                });
+            }
+
+            loadBracketTournaments() {
+                const select = document.getElementById('bracketTournamentSelect');
+                select.innerHTML = '<option value="">Select Tournament</option>';
+
+                this.tournaments.forEach(tournament => {
+                    const option = document.createElement('option');
+                    option.value = tournament.id;
+                    option.textContent = `${tournament.name} (${tournament.players.length}/${tournament.maxPlayers})`;
+                    select.appendChild(option);
+                });
+            }
+
+            handleAddTournament() {
+                const name = document.getElementById('tournamentName').value;
+                const date = document.getElementById('tournamentDate').value;
+                const maxPlayers = parseInt(document.getElementById('maxPlayers').value);
+                const status = document.getElementById('tournamentStatus').value;
+
+                if (!name || !date || !maxPlayers) {
+                    this.showMessage('Please fill in all required fields!', 'error');
+                    return;
+                }
+
+                const newTournament = {
+                    id: Date.now(),
+                    name,
+                    date,
+                    maxPlayers,
+                    status,
+                    players: [],
+                    bracketHTML: ''
+                };
+
+                this.tournaments.push(newTournament);
+                this.saveData();
+                this.loadDashboard();
+                document.getElementById('addTournamentForm').reset();
+                this.showMessage('Tournament added successfully!', 'success');
+            }
+
+            generateTournamentBracket(tournamentId) {
+                const tournament = this.tournaments.find(t => t.id === tournamentId);
+                if (!tournament) return;
+
+                const playerNames = tournament.players.map(playerId => {
+                    const user = this.users.find(u => u.id === playerId);
+                    return user ? user.username : 'Unknown';
+                });
+
+                tournament.bracketHTML = this.generateBracket(playerNames);
+                this.saveData();
+                this.loadTournaments();
+                this.showMessage('Bracket generated successfully!', 'success');
+            }
+
+            generateBracket(players) {
+                if (players.length < 2) {
+                    return '<p>Not enough players for a bracket.</p>';
+                }
+
+                const targetSize = Math.pow(2, Math.ceil(Math.log2(players.length)));
+                while (players.length < targetSize) {
+                    players.push('TBD');
+                }
+
+                let html = '<div class="bracket">';
+                const rounds = Math.log2(targetSize);
+                
+                for (let round = 0; round < rounds; round++) {
+                    html += '<div class="bracket-round">';
+                    html += `<div class="round-title">Round ${round + 1}</div>`;
+                    
+                    const matchesInRound = Math.pow(2, rounds - round - 1);
+                    
+                    for (let match = 0; match < matchesInRound; match++) {
+                        const matchId = `r${round}m${match}`;
+                        html += `<div class="bracket-match" data-match-id="${matchId}">`;
+                        
+                        if (round === 0) {
+                            const player1 = players[match * 2] || 'TBD';
+                            const player2 = players[match * 2 + 1] || 'TBD';
+                            html += `
+                                <div class="bracket-player selectable" onclick="adminPanel.selectWinner('${matchId}', '${player1}')">${player1}</div>
+                                <div class="bracket-vs">VS</div>
+                                <div class="bracket-player selectable" onclick="adminPanel.selectWinner('${matchId}', '${player2}')">${player2}</div>
+                            `;
+                        } else {
+                            html += `
+                                <div class="bracket-player">TBD</div>
+                                <div class="bracket-vs">VS</div>
+                                <div class="bracket-player">TBD</div>
+                            `;
+                        }
+                        
+                        html += '</div>';
+                    }
+                    html += '</div>';
+                }
+                
+                html += '</div>';
+                return html;
+            }
+
+            selectWinner(matchId, winner) {
+                const modal = document.getElementById('bracketModal');
+                const currentMatch = modal.querySelector(`[data-match-id="${matchId}"]`);
+                if (!currentMatch) return;
+
+                const players = currentMatch.querySelectorAll('.bracket-player');
+                players.forEach(player => {
+                    player.classList.remove('winner', 'selectable');
+                    if (player.textContent === winner) {
+                        player.classList.add('winner');
+                    }
+                });
+
+                // Advance to next round logic
+                const roundMatch = matchId.match(/r(\d+)m(\d+)/);
+                const round = parseInt(roundMatch[1]);
+                const matchIndex = parseInt(roundMatch[2]);
+                
+                const nextRound = round + 1;
+                const nextMatchIndex = Math.floor(matchIndex / 2);
+                const nextMatchId = `r${nextRound}m${nextMatchIndex}`;
+                const nextMatch = modal.querySelector(`[data-match-id="${nextMatchId}"]`);
+                
+                if (nextMatch) {
+                    const nextPlayers = nextMatch.querySelectorAll('.bracket-player');
+                    const playerPosition = matchIndex % 2;
+                    
+                    if (nextPlayers[playerPosition]) {
+                        nextPlayers[playerPosition].textContent = winner;
+                        
+                        if (nextPlayers[0].textContent !== 'TBD' && nextPlayers[1].textContent !== 'TBD') {
+                            nextPlayers.forEach(player => {
+                                player.classList.add('selectable');
+                                const playerName = player.textContent;
+                                player.setAttribute('onclick', `adminPanel.selectWinner('${nextMatchId}', '${playerName}')`);
+                            });
+                        }
+                    }
+                }
+
+                this.showMessage(`${winner} advances to the next round!`, 'success');
+            }
+
+            viewTournamentBracket(tournamentId) {
+                const tournament = this.tournaments.find(t => t.id === tournamentId);
+                if (!tournament) return;
+
+                const modal = document.getElementById('bracketModal');
+                const title = document.getElementById('bracketTitle');
+                const content = document.getElementById('bracketContent');
+
+                title.textContent = `${tournament.name} - Bracket`;
+                content.innerHTML = tournament.bracketHTML || '<p>No bracket generated yet.</p>';
+                modal.style.display = 'block';
+            }
+
+            deleteTournament(tournamentId) {
+                this.showConfirmModal('Are you sure you want to delete this tournament?', () => {
+                    this.tournaments = this.tournaments.filter(t => t.id !== tournamentId);
+                    this.users.forEach(user => {
+                        user.joinedTournaments = user.joinedTournaments.filter(id => id !== tournamentId);
+                    });
+                    this.saveData();
+                    this.loadDashboard();
+                    this.showMessage('Tournament deleted successfully!', 'success');
+                });
+            }
+
+            deleteUser(userId) {
+                this.showConfirmModal('Are you sure you want to delete this user?', () => {
+                    this.users = this.users.filter(u => u.id !== userId);
+                    this.tournaments.forEach(tournament => {
+                        tournament.players = tournament.players.filter(id => id !== userId);
+                    });
+                    this.saveData();
+                    this.loadDashboard();
+                    this.showMessage('User deleted successfully!', 'success');
+                });
+            }
+
+            exportAllData() {
+                const data = this.dataSync.export();
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `tournament-data-${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                this.showMessage('Data exported successfully!', 'success');
+            }
+            
+            importData() {
+                document.getElementById('importFile').click();
+            }
+            
+            handleImportData(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        this.dataSync.import(data);
+                        this.loadData();
+                        this.loadDashboard();
+                        this.showMessage('Data imported successfully!', 'success');
+                    } catch (error) {
+                        this.showMessage('Invalid file format!', 'error');
+                    }
+                };
+                reader.readAsText(file);
+            }
+
+            resetAllData() {
+                this.showConfirmModal('Are you sure you want to reset ALL data? This cannot be undone!', () => {
+                    this.dataSync.clear();
+                    window.location.reload();
+                });
+            }
+
+            saveData() {
+                this.dataSync.save(this.dataSync.storageKeys.users, this.users);
+                this.dataSync.save(this.dataSync.storageKeys.tournaments, this.tournaments);
+                if (this.currentUser) {
+                    this.dataSync.save(this.dataSync.storageKeys.currentUser, this.currentUser);
+                }
+            }
+
+            showMessage(message, type) {
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.textContent = message;
+                document.getElementById('toastContainer').appendChild(toast);
+
+                setTimeout(() => {
+                    toast.remove();
+                }, 3000);
+            }
+
+            showConfirmModal(message, callback) {
+                document.getElementById('confirmMessage').textContent = message;
+                document.getElementById('confirmModal').style.display = 'block';
+                this.currentAction = callback;
+            }
+
+            confirmAction() {
+                if (this.currentAction) {
+                    this.currentAction();
+                    this.currentAction = null;
+                }
+                this.closeConfirmModal();
+            }
+
+            closeConfirmModal() {
+                document.getElementById('confirmModal').style.display = 'none';
+                this.currentAction = null;
+            }
+        }
+
+        // Global functions
+        function filterAdminTournaments(status) {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            const tournamentCards = document.querySelectorAll('.admin-tournament-item');
+            tournamentCards.forEach(card => {
+                const statusElement = card.querySelector('[data-status]');
+                if (status === 'all' || (statusElement && statusElement.dataset.status === status)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Initialize admin panel
+        document.addEventListener('DOMContentLoaded', function() {
+            window.adminPanel = new AdminPanel();
+        });
+    </script>
+</body>
+</html>ectorAll('.admin-tournament-item').forEach(item => {
+                if (status === 'all' || item.dataset.status === status) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            document.querySelectorAll('.tournament-filter .filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function filterUsers() {
+            const searchTerm = document.getElementById('userSearch').value.toLowerCase();
+            document.querySelectorAll('.admin-user-item').forEach(item => {
+                const username = item.querySelector('h4').textContent.toLowerCase();
+                if (username.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+
+        function closeBracketModal() {
+            document.getElementById('bracketModal').style.display = 'none';
+        }
+
+        function closeConfirmModal() {
+            adminPanel.closeConfirmModal();
+        }
+
+        function confirmAction() {
+            adminPanel.confirmAction();
+        }
+
+        // Initialize admin panel
+        let adminPanel;
+        document.addEventListener('DOMContentLoaded', function() {
+            adminPanel = new AdminPanel();
+        });
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const bracketModal = document.getElementById('bracketModal');
+            const confirmModal = document.getElementById('confirmModal');
+            
+            if (event.target === bracketModal) {
+                closeBracketModal();
+            }
+            if (event.target === confirmModal) {
+                closeConfirmModal();
+            }
+        }
+    </script>
+</body>
+</html>

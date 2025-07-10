@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookie's Tournaments - Smash Karts</title>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <h2>🍪 Cookie's Tournaments</h2>
+        </div>
+        <div class="nav-links">
+            <a href="#" onclick="showPage('home')" class="nav-link active">Home</a>
+            <a href="#" onclick="showPage('tournaments')" class="nav-link">Tournaments</a>
+            <a href="#" onclick="showPage('leaderboard')" class="nav-link">Leaderboard</a>
+            <a href="#" onclick="showPage('profile')" class="nav-link" id="profileLink">Profile</a>
+            <a href="#" onclick="showPage('login')" class="nav-link" id="loginLink">Login</a>
+            <a href="#" onclick="logout()" class="nav-link hidden" id="logoutLink">Logout</a>
+            <a href="admin.html" class="nav-link hidden" id="adminLink">Admin</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Home Page -->
+        <div id="homePage" class="page active">
+            <div class="hero">
+                <h1>Welcome to Cookie's Tournaments</h1>
+                <p>The ultimate destination for competitive Smash Karts tournaments!</p>
+                <p>Join thrilling tournaments, climb the leaderboard, and prove you're the best racer!</p>
+                <button class="cta-button" onclick="showPage('tournaments')">🏆 Join Tournament</button>
+            </div>
+            <div class="features">
+                <div class="feature-card">
+                    <h3>🎯 Competitive Play</h3>
+                    <p>Join organized tournaments with players from around the world</p>
+                </div>
+                <div class="feature-card">
+                    <h3>📊 Track Progress</h3>
+                    <p>Monitor your wins, losses, and climb the global leaderboard</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🏅 Brackets</h3>
+                    <p>View tournament brackets and follow your path to victory</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tournaments Page -->
+        <div id="tournamentsPage" class="page">
+            <h1>Tournaments</h1>
+            <div class="tournaments-filter">
+                <button class="filter-btn active" onclick="filterTournaments('all')">All</button>
+                <button class="filter-btn" onclick="filterTournaments('upcoming')">Upcoming</button>
+                <button class="filter-btn" onclick="filterTournaments('ongoing')">Ongoing</button>
+                <button class="filter-btn" onclick="filterTournaments('finished')">Finished</button>
+            </div>
+            <div id="tournamentsList" class="tournaments-list"></div>
+        </div>
+
+        <!-- Leaderboard Page -->
+        <div id="leaderboardPage" class="page">
+            <h1>Leaderboard</h1>
+            <div id="leaderboardList" class="leaderboard-list"></div>
+        </div>
+
+        <!-- Profile Page -->
+        <div id="profilePage" class="page">
+            <h1>My Profile</h1>
+            <div id="profileContent" class="profile-content"></div>
+        </div>
+
+        <!-- Login Page -->
+        <div id="loginPage" class="page">
+            <div class="auth-container">
+                <h1>Login</h1>
+                <form id="loginForm" class="auth-form">
+                    <input type="text" id="loginUsername" placeholder="Username" required>
+                    <input type="password" id="loginPassword" placeholder="Password" required>
+                    <button type="submit">Login</button>
+                </form>
+                <p>Don't have an account? <a href="#" onclick="showPage('register')">Register here</a></p>
+            </div>
+        </div>
+
+        <!-- Register Page -->
+        <div id="registerPage" class="page">
+            <div class="auth-container">
+                <h1>Register</h1>
+                <form id="registerForm" class="auth-form">
+                    <input type="text" id="registerUsername" placeholder="Username" required>
+                    <input type="password" id="registerPassword" placeholder="Password" required>
+                    <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+                    <button type="submit">Register</button>
+                </form>
+                <p>Already have an account? <a href="#" onclick="showPage('login')">Login here</a></p>
+            </div>
+        </div>
+
+        <!-- Admin Panel -->
+        <div id="adminPage" class="page">
+            <h1>🛠️ Admin Panel</h1>
+            <div class="admin-info">
+                <p><strong>Welcome, Administrator!</strong></p>
+                <small>Manage tournaments, users, and generate brackets from this control panel.</small>
+            </div>
+            <div class="admin-sections">
+                <div class="admin-section">
+                    <h3>Add New Tournament</h3>
+                    <form id="addTournamentForm" class="admin-form">
+                        <input type="text" id="tournamentName" placeholder="Tournament Name" required>
+                        <input type="date" id="tournamentDate" required>
+                        <select id="maxPlayers" required>
+                            <option value="">Max Players</option>
+                            <option value="2">2 Players</option>
+                            <option value="4">4 Players</option>
+                            <option value="8">8 Players</option>
+                            <option value="16">16 Players</option>
+                        </select>
+                        <button type="submit">Add Tournament</button>
+                    </form>
+                </div>
+                <div class="admin-section">
+                    <h3>Manage Tournaments</h3>
+                    <div id="adminTournamentsList"></div>
+                </div>
+                <div class="admin-section">
+                    <h3>Registered Users</h3>
+                    <div id="adminUsersList"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Notifications -->
+        <div id="toastContainer" class="toast-container"></div>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" class="loading-indicator hidden">
+            <div class="spinner"></div>
+            <p>Loading...</p>
+        </div>
+
+        <!-- Tournament Bracket Modal -->
+        <div id="bracketModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeBracketModal()">&times;</span>
+                <h2 id="bracketTitle">Tournament Bracket</h2>
+                <div id="bracketContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="users.js"></script>
+    <script src="tournaments.js"></script>
+</body>
+</html>
